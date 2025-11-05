@@ -1,0 +1,5 @@
+WHITESPACE = _{ " " | "\n" | "\t" }
+text = { SOI ~ pair* ~ EOI }
+pair = { word ~ emoji+ }
+word = { ascii_alpha+ }
+emoji = @{ [\p{Emoji}] }
