@@ -1,5 +1,8 @@
 WHITESPACE = _{ " " | "\n" | "\t" }
 text = { SOI ~ pair* ~ EOI }
 pair = { word ~ emoji+ }
-word = { ascii_alpha+ }
-emoji = @{ [\p{Emoji}] }
+word = { ASCII_ALPHA+ }
+emoji = { positive | negative | neutral }
+positive = { "😊" | "😀" | "😄" | "😂" | "😍" | "🥰" | "👍" | "🎉" }
+negative = { "😞" | "😢" | "😠" | "😡" | "😭" | "👎" | "💔" | "😤" }
+neutral = { "😐" | "🤔" | "😶" | "🤷" | "📄" | "🔍" }
