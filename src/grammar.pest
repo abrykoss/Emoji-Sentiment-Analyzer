@@ -1,5 +1,6 @@
 WHITESPACE = _{ " " | "\n" | "\t" }
-text = { SOI ~ pair* ~ EOI }
+PUNCTUATION = _{ "." | "," | "!" | "?" | ";" | ":" | "-" | "'" | "\"" }
+text = { SOI ~ (pair | word | PUNCTUATION)* ~ EOI }
 pair = { word ~ emoji+ }
 word = { ASCII_ALPHA+ }
 emoji = { positive | negative | neutral }
