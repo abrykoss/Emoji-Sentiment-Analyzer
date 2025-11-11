@@ -1,8 +1,11 @@
-WHITESPACE = _{ " " | "\n" | "\t" }
+WHITESPACE = _{ " " | "\n" | "\r" | "\t" }
 PUNCTUATION = _{ "." | "," | "!" | "?" | ";" | ":" | "-" | "'" | "\"" }
-text = { SOI ~ (pair | word | PUNCTUATION)* ~ EOI }
+text = { SOI ~ (sentence | pair | hashtag | word)* ~ EOI }
 pair = { word ~ emoji+ }
 word = { ASCII_ALPHA+ }
+sentence = { (pair | hashtag | word)+ ~ modifier* ~ ( "." | "!" | "?" )? }
+modifier = { "AND" | "OR" | "*" }
+hashtag = { "#" ~ (word | ASCII_DIGIT+)+ ~ emoji* ~ ( "," ~ emoji )? }
 emoji = { positive | negative | neutral }
 positive = { "😊" | "😀" | "😄" | "😂" | "😍" | "🥰" | "👍" | "🎉" }
 negative = { "😞" | "😢" | "😠" | "😡" | "😭" | "👎" | "💔" | "😤" }

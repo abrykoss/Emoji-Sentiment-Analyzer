@@ -4,7 +4,7 @@ use thiserror::Error;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
-struct EmojiParser;
+pub struct EmojiParser;
 
 
 #[derive(Error, Debug)]
@@ -17,46 +17,42 @@ pub enum ParseError {
 
 
 pub fn parse_text(input: &str) -> Result<f32, ParseError> {
-    let mut lines = input.lines();
+    let parse = EmojiParser::parse(Rule::text, input)?;
 
-    let mut total_score = 0.0;
-    let mut line_count = 0;
-    while let Some(line) = lines.next() {
+    let mut total = 0.0;
+    let mut count = 0;
 
-        let parse = EmojiParser::parse(Rule::text, line)?;
-        let mut line_total = 0.0;
-        let mut pair_count = 0;
+    for sentence in parse.flatten() {
 
-        for pair in parse.flatten() {
+        if sentence.as_rule() == Rule::sentence {
+            for item in sentence.into_inner() {
 
-            if pair.as_rule() == Rule::pair {
-                let mut emojis = Vec::new();
+                if item.as_rule() == Rule::pair || item.as_rule() == Rule::hashtag {
+                    let mut emojis = Vec::new();
+                    for child in item.into_inner() {
 
-                for child in pair.into_inner() {
+                        if child.as_rule() == Rule::emoji {
+                            emojis.push(child.as_str());
+                        }
 
-                    if child.as_rule() == Rule::emoji {
-                        emojis.push(child.as_str());
                     }
-                }
-                if !emojis.is_empty() {
-                    let base_sentiment = classify_emoji(emojis[0]);
+                    if !emojis.is_empty() {
+                        let base_sentiment = classify_emoji(emojis[0]);
+                        let intensity = emojis.len() as f32;
+                        total += base_sentiment * intensity;
+                        count += 1;
+                    }
 
-                    let intensity = emojis.len() as f32;
-                    
-                    line_total += base_sentiment * intensity;
-                    pair_count += 1;
                 }
 
             }
+
         }
 
-        if pair_count > 0 {
-            total_score += line_total / pair_count as f32;
-            line_count += 1;
-        }
     }
-    let score = if line_count > 0 { total_score / line_count as f32 } else { 0.0 };
-    
+
+    let score = if count > 0 { total / count as f32 } else { 0.0 };
+
     Ok(score)
 }
 
